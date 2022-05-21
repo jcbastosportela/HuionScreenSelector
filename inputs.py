@@ -34,8 +34,11 @@ class HuionDevice:
     input_type: str
 
 
-def get_huion_pointer_devices() -> List[HuionDevice]:
+def get_huion_pointer_devices(device_name_match:str) -> List[HuionDevice]:
     """Gets the list of huion devices that are pointers connected to the system
+    
+    Args:
+        device_name_match (str): String for matching with the devices names returned by xinput. Empty string means all devices.
 
     Raises:
         ExecError: if getting devices fails
@@ -64,9 +67,10 @@ def get_huion_pointer_devices() -> List[HuionDevice]:
             device_name = data.group(1).strip()
             device_id = int(data.group(2))
             input_type = data.group(3)
-            if "huion" in device_name.lower() and "pointer" in input_type.lower():
+            if device_name_match.lower() in device_name.lower() and "pointer" in input_type.lower():
                 disp = HuionDevice(device_name, device_id, input_type)
                 ret.append(disp)
+                _logger.debug(device_name)
 
     except Exception as e:
         raise BadResult(e)
